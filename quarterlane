@@ -1,0 +1,28 @@
+#!/bin/bash
+
+while getopts ":q:l:p:d:" opt; do
+  case $opt in
+    q) QUARTER=$OPTARG;;
+    l) LANE=$OPTARG;;
+    p) POOL=$OPTARG;;
+    d) DATASHEET=$OPTARG;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      ;;
+  esac
+done
+
+case "$QUARTER" in 
+  1) 
+    lane -l $LANE -p $POOL -d $DATASHEET | head -192
+    ;;
+  2)
+    lane -l $LANE -p $POOL -d $DATASHEET | head -384 | tail -192
+    ;;
+  3)
+    lane -l $LANE -p $POOL -d $DATASHEET | tail -384 | head -192
+    ;;
+  4)
+    lane -l $LANE -p $POOL -d $DATASHEET | tail -192
+    ;;
+esac
