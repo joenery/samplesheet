@@ -1,4 +1,5 @@
 #!/bin/awk -f
+#strips everything above and including the header row from a SampleSheet.csv
 
 f;/Sample_ID/{f=1}
 
