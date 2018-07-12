@@ -1,0 +1,4 @@
+#!/bin/awk -f
+
+f;/Sample_ID/{f=1}
+
