@@ -1,0 +1,33 @@
+#!/bin/bash
+
+usage() {
+echo "eg, samplesheet-ids -s SampleSheet-cl.csv -m n"
+echo "-s, samplesheet filename"
+echo "-m, (y/n) if miseq sample sheet"
+echo "-h, display this help message"
+}
+
+while getopts ":s:m:h" opt; do
+  case $opt in
+    s) SAMPLESHEET=$OPTARG;;
+    m) MISEQ=$OPTARG;;
+    h) usage;;
+  esac
+done
+
+print_col () {
+  echo $1 | more
+  samplesheet-data $SAMPLESHEET | awk -v col=$1 -F, '{print $col}' | sort | uniq
+}
+
+case "$MISEQ" in
+  [yY] | [yY][Ee][Ss] ) 
+    print_col "1"
+    ;;
+  [nN] | [nN][Oo] ) 
+    print_col "2"
+    ;;
+  *) echo "Must specify whether it's a miseq samplesheet"
+    usage
+    ;;
+esac

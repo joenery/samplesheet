@@ -1,0 +1,30 @@
+#!/bin/bash
+
+usage() {
+echo "eg, lane -p mCT_NOME_E14GM -d hic-methylome::libraries.DataSheet -l $i -m n"
+echo "-p, pool name"
+echo "-d, datasheet"
+echo "-l, lane number"
+echo "-m, (y/n) if miseq sample sheet"
+echo "-h, display this help message"
+}
+
+while getopts ":p:d:l:m:h" opt; do
+  case $opt in
+    p) POOL=$OPTARG;;
+    d) DATASHEET=$OPTARG;;
+    l) LANE=$OPTARG;;
+    m) MISEQ=$OPTARG;;
+    h) usage;;
+  esac
+done
+
+case "$MISEQ" in
+  miseq) grep -a $POOL /gale/oberon/data1/lims/$DATASHEET | \
+    awk '{FS = "\t"; print $18 ",," $2 ",,," $19 ",," $20 "," $21 "," $30}'
+    ;;
+  4000) grep -a $POOL /gale/oberon/data1/lims/$DATASHEET | \
+    awk -v lane="$LANE" \
+    '{FS = "\t"; print lane "," $18 ",," $2 ",,," $19 ",," $20 "," $21 "," $30}'
+    ;;
+esac
