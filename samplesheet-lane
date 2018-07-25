@@ -1,7 +1,9 @@
 #!/bin/bash
 
+LIMS_PARENT="/gale/oberon/data1/lims"
+
 usage() {
-echo "eg, lane -p mCT_NOME_E14GM -d hic-methylome::libraries.DataSheet -l $i -m n"
+echo "eg, samplesheet-lane -p mCT_NOME_E14GM -d hic-methylome::libraries.DataSheet -l 1 -m n"
 echo "-p, pool name"
 echo "-d, datasheet"
 echo "-l, lane number"
@@ -19,12 +21,11 @@ while getopts ":p:d:l:m:h" opt; do
   esac
 done
 
+datasheet="$LIMS_PARENT/$DATASHEET"
+
 case "$MISEQ" in
-  miseq) grep -a $POOL /gale/oberon/data1/lims/$DATASHEET | \
-    awk '{FS = "\t"; print $18 ",," $2 ",,," $19 ",," $20 "," $21 "," $30}'
+  y) grep -a $POOL $datasheet | awk '{FS = "\t"; print $18 ",," $2 ",,," $19 ",," $20 "," $21 "," $30}'
     ;;
-  4000) grep -a $POOL /gale/oberon/data1/lims/$DATASHEET | \
-    awk -v lane="$LANE" \
-    '{FS = "\t"; print lane "," $18 ",," $2 ",,," $19 ",," $20 "," $21 "," $30}'
+  n) grep -a $POOL $datasheet | awk -v lane="$LANE" '{FS = "\t"; print lane "," $18 ",," $2 ",,," $19 ",," $20 "," $21 "," $30}'
     ;;
 esac
