@@ -24,8 +24,8 @@ done
 datasheet="$LIMS_PARENT/$DATASHEET"
 
 case "$MISEQ" in
-  y) grep -a $POOL $datasheet | awk '{print $18 ",," $2 ",,," $19 ",," $20 "," $21 "," $30}'
+  y) grep -a $POOL $datasheet | awk -F "\t" '{print $18 ",," $2 ",,," $19 ",," $20 "," $21 "," $30}'
     ;;
-  n) grep -a $POOL $datasheet | awk -v lane="$LANE" '{print lane "," $18 ",," $2 ",,," $19 ",," $20 "," $21 "," $30}'
+  n) grep -a $POOL $datasheet | awk -F "\t" -v lane="$LANE" '{print lane "," $18 ",," $2 ",,," $19 ",," $20 "," $21 "," $30}'
     ;;
 esac
