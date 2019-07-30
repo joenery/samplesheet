@@ -1,31 +1,45 @@
 #!/bin/bash
 
-LIMS_PARENT="/gale/oberon/data1/lims"
+lims="/gale/oberon/data1/lims/"
 
 usage() {
-echo "eg, samplesheet-lane -p mCT_NOME_E14GM -d hic-methylome::libraries.DataSheet -l 1 -m n"
-echo "-p, pool name"
-echo "-d, datasheet"
-echo "-l, lane number"
-echo "-m, (y/n) if miseq sample sheet"
-echo "-h, display this help message"
+echo "usage:	 samplesheet-lane -p mCT_NOME_E14GM -d hic-methylome::libraries.DataSheet -l 1 -m n"
+echo "-p 	pool name"
+echo "-d	path to datasheet in $lims"
+echo "-l	lane number"
+echo "-m	miseq sample sheet toggle"
+echo "-s	simple csv format"
+echo "-h	display this help message"
+exit 1
 }
 
-while getopts ":p:d:l:m:h" opt; do
+miseq=false
+simple=false
+
+while getopts ":p:d:l:msh" opt; do
   case $opt in
-    p) POOL=$OPTARG;;
-    d) DATASHEET=$OPTARG;;
-    l) LANE=$OPTARG;;
-    m) MISEQ=$OPTARG;;
+    p) pool=$OPTARG;;
+    d) datasheet="$OPTARG";;
+    l) lane=$OPTARG;;
+    m) miseq=true;;
+    s) simple=true;;
     h) usage;;
   esac
 done
 
-datasheet="$LIMS_PARENT/$DATASHEET"
 
-case "$MISEQ" in
-  y) grep -a $POOL $datasheet | awk -F "\t" '{print $18 ",," $2 ",,," $19 ",," $20 "," $21 "," $30}'
-    ;;
-  n) grep -a $POOL $datasheet | awk -F "\t" -v lane="$LANE" '{print lane "," $18 ",," $2 ",,," $19 ",," $20 "," $21 "," $30}'
-    ;;
-esac
+if $simple = "true" ; then
+  grep -a $pool $datasheet | awk -F "\t" -v lane="$lane" '{print lane "," $18 "," $19}'
+
+else
+
+  if "$miseq" = "true" ; then
+    [ -z $pool ] && awk -F "\t" '{print $18 ",," $2 ",,," $19 ",," $20 "," $21 "," $30}' $datasheet | grep -v ",,,,,,,,," || \
+  grep -a $pool $datasheet | awk -F "\t" '{print $18 ",," $2 ",,," $19 ",," $20 "," $21 "," $30}'
+
+  else
+   [ -z $pool ] && awk -F "\t" -v lane="$lane" '{print lane "," $18 ",," $2 ",,," $19 ",," $20 "," $21 "," $30}' $datasheet grep -v ",,,,,,,,," || \
+  grep -a $pool $datasheet | awk -F "\t" -v lane="$lane" '{print lane "," $18 ",," $2 ",,," $19 ",," $20 "," $21 "," $30}' 
+  fi
+
+fi
